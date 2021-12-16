@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-import { MinPriorityQueue } from "@datastructures-js/priority-queue";
-
 const { MinPriorityQueue } = require("@datastructures-js/priority-queue");
 /** Required libraries */
 const mongoose = require("mongoose");
@@ -25,7 +23,7 @@ const database = require("./Database");
 const booking = require("./Models/booking.js");
 
 mqtt.subscribeToTopic(checkBookingTopic); //TODO: Update to the topic from frontend
-mqtt.subscribeToTopic(getTimeslotTopic);
+//mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
 
