@@ -16,7 +16,6 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "js-priority-queue": "^0.1.5",
     "mongoose": "^6.0.13",
     "mqtt": "^4.2.8"
   },
