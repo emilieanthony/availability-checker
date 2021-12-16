@@ -1,17 +1,14 @@
 require("dotenv").config();
 
-import {
-  MinPriorityQueue,
-} from '@datastructures-js/priority-queue';
+import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 
-const {
-  MinPriorityQueue
-} = require('@datastructures-js/priority-queue');
+const { MinPriorityQueue } = require("@datastructures-js/priority-queue");
 /** Required libraries */
 const mongoose = require("mongoose");
 
 /** Database Models */
 const Booking = require("./Models/booking.js");
+const Dentist = require("./Models/dentist.js");
 
 /** Import the Mqtt file which connects to the broker and provide client,as well as publishing and subscribing functions */
 const mqtt = require("./Mqtt");
@@ -35,7 +32,9 @@ mqtt.subscribeToTopic(getTimeslotTopic);
 mqtt.client.on("message", function (topic, message) {
   switch (topic) {
     case checkBookingTopic:
-      // method call
+      bookingQueue(JSON.parse(message));
+      bookingAvailability();
+
       break;
     case getTimeslotTopic:
       //method call
@@ -47,24 +46,47 @@ mqtt.client.on("message", function (topic, message) {
 
 /**  Functions */
 
-var issuanceQueue = new MinPriorityQueue();
+var issuanceQueue = new MinPriorityQueue({
+  priority: (booking) => booking.issuance,
+});
 
 const bookingQueue = (booking) => {
-  issuanceQueue.enqueue(booking, booking.issuance); 
-
-  // pop all bookings in the queue
-
-
-}
-
-const bookingAvailability = (booking) => {
-  //need clinicID (+number of dentists), date, starttime
-  // query data base + return number of available booking. find same clinic id and number of dentist
-  // the method return the number of available bookings for that clinic on that specific time.
+  issuanceQueue.enqueue(booking);
 };
 
-const checkAvailability = (bookingAvailability, booking) => {
-  if (bookingAvailability > 0) {
+const bookingAvailability = () => {
+  //refactor after testing
+  const booking = issuanceQueue.dequeue();
+  Dentist.findById(booking.clinicID, function (err, dentist) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    if (!dentist) {
+      console.error(err);
+      console.log("Dentist not found");
+      return;
+    }
+    Booking.find(
+      {
+        clinicID: booking.clinicID,
+        date: booking.date,
+        starttime: booking.starttime,
+      },
+      function (err, bookings) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        const nrAvailableDentists = dentist.dentists - bookings.length;
+        checkAvailability(nrAvailableDentists, booking);
+      }
+    );
+  });
+};
+
+const checkAvailability = (nrAvailableDentists, booking) => {
+  if (nrAvailableDentists > 0) {
     forwardBooking(booking);
   } else {
     rejectBooking(booking);
