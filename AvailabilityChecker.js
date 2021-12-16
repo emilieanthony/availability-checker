@@ -1,4 +1,12 @@
 require("dotenv").config();
+
+import {
+  MinPriorityQueue,
+} from '@datastructures-js/priority-queue';
+
+const {
+  MinPriorityQueue
+} = require('@datastructures-js/priority-queue');
 /** Required libraries */
 const mongoose = require("mongoose");
 
@@ -39,9 +47,15 @@ mqtt.client.on("message", function (topic, message) {
 
 /**  Functions */
 
-const issuanceQueue = new PriorityQueue({
-  // Implement priority + comparator
-});
+var issuanceQueue = new MinPriorityQueue();
+
+const bookingQueue = (booking) => {
+  issuanceQueue.enqueue(booking, booking.issuance); 
+
+  // pop all bookings in the queue
+
+
+}
 
 const bookingAvailability = (booking) => {
   //need clinicID (+number of dentists), date, starttime
