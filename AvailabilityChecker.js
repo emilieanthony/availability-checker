@@ -230,7 +230,7 @@ function saveTimeslotsAsArray (message) {
     //let timeslots = [];
     //timeslots.push(timeslot);
     console.log(timeslot); 
-    updateBreaks(timeslot);
+    const result = updateBreaks(timeslot);
     // Get non-filter timeslots in array
 };
 
@@ -238,11 +238,8 @@ function saveTimeslotsAsArray (message) {
 
 function updateBreaks (timeslots) {
 
-  breaks(timeslots);
-  const result = timeslots.timeslots.filter(item => item.start !== '12:00' && item.start !== '12:30' && item.start !== '10:00' && item.start !== '15:00');
+  return result = timeslots.timeslots.filter(item => item.start !== '12:00' && item.start !== '12:30' && item.start !== '10:00' && item.start !== '15:00');
 
-  console.log('after filter')
-  console.log(result);
   // timeslots = fikaBreak(timeslots); 
   // After this check bookings 
 };
