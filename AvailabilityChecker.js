@@ -13,11 +13,11 @@ const mqtt = require("./Mqtt");
 
 /**  Subscribed topics */
 const checkBookingTopic = "Team5/Dentistimo/Check/Booking"; //Booking information from frontend - confirm - should include issuance
-const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots"
+const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots";
 /**  Published topics */
 const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forward to Booking Handler
-const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Message to frontend
-const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"
+const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Forward to Frontend
+const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"; // Forward to Frontend
 
 /** Import the database. Connection happens in the Database.js file */
 const database = require("./Database");
@@ -27,137 +27,18 @@ mqtt.subscribeToTopic(checkBookingTopic); //TODO: Update to the topic from front
 mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
-var data = {
-  "clinicId": "1",
-  "timeslots":[
-    {
-      "_id": "61bc57e6ce0d87512e7329ab",
-      "start": "9:00",
-      "end": "9:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329ac",
-      "start": "9:30",
-      "end": "10:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329ad",
-      "start": "10:00",
-      "end": "10:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329ae",
-      "start": "10:30",
-      "end": "11:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329af",
-      "start": "11:00",
-      "end": "11:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b0",
-      "start": "11:30",
-      "end": "12:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b1",
-      "start": "12:00",
-      "end": "12:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b2",
-      "start": "12:30",
-      "end": "13:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b3",
-      "start": "13:00",
-      "end": "13:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b4",
-      "start": "13:30",
-      "end": "14:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b5",
-      "start": "14:00",
-      "end": "14:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b6",
-      "start": "14:30",
-      "end": "15:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b7",
-      "start": "15:00",
-      "end": "15:30",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b8",
-      "start": "15:30",
-      "end": "16:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329b9",
-      "start": "16:00",
-      "end": "16:30",
-      "available": 3,
-      "date": "Thu Dec \r\n02 2021"
-    },
-    {
-      "_id": "61bc57e6ce0d87512e7329ba",
-      "start": "16:30",
-      "end": "17:00",
-      "available": 3,
-      "date": "Thu Dec 02 2021"
-    }
-  ]
-  }
-
-console.log(data);
-const test = saveTimeslotsAsArray(data);
-
 mqtt.client.on("message", function (topic, message) {
   switch (topic) {
     case checkBookingTopic:
+      console.log(
+        "Message booking from Frontend" + JSON.parse(message.toString())
+      );
       bookingQueue(JSON.parse(message));
       bookingAvailability();
-
       break;
     case getTimeslotTopic:
-      //saveTimeslotsAsArray(JSON.parse(message));
-      //method call
+      console.log("Message from Timeslot" + JSON.parse(message.toString()));
+      saveTimeslotsAsArray(JSON.parse(message));
       break;
     default:
       break;
@@ -165,7 +46,7 @@ mqtt.client.on("message", function (topic, message) {
 });
 
 /*  Check booking Functions */
-
+// TODO: Errror handling (clinic null)
 var issuanceQueue = new MinPriorityQueue({
   priority: (booking) => booking.issuance,
 });
@@ -223,64 +104,63 @@ const rejectBooking = (booking) => {
   console.log("Booking rejected:" + bookingInfo);
 };
 
-
 /* Check timeslots functions */
 
-function saveTimeslotsAsArray (message) {
-    let timeslot = message;
-    //let timeslots = [];
-    //timeslots.push(timeslot);
-    console.log(timeslot); 
-    const result = updateBreaks(timeslot);
-    console.log('result')
+function saveTimeslotsAsArray(message) {
+  let timeslot = message;
+  //let timeslots = [];
+  //timeslots.push(timeslot);
+  console.log("saveTimeSlotArray:" + timeslot);
+  const result = updateBreaks(timeslot);
+  console.log("result");
 
-    console.log(result)
-    checkBookings(result, timeslot.clinicId);
-    // Get non-filter timeslots in array
-};
+  console.log("saveTimeSlotArray RESULT AFTER FILTERING:" + result);
+  checkBookings(result, timeslot.clinicId);
+}
 
+function updateBreaks(timeslots) {
+  // TODO: Refactor magic numbers
+  return (result = timeslots.timeSlots.filter(
+    (item) =>
+      item.start !== "12:00" &&
+      item.start !== "12:30" &&
+      item.start !== "10:00" &&
+      item.start !== "15:00"
+  ));
+}
 
+// check bookings
+function checkBookings(timeslots, clinicID) {
+  console.log("check boookings, clinic: " + clinicID);
 
-function updateBreaks (timeslots) {
-  return result = timeslots.timeslots.filter(item => item.start !== '12:00' && item.start !== '12:30' && item.start !== '10:00' && item.start !== '15:00');
-};
-
-// check bookings 
-function checkBookings (timeslots, clinicID) {
-  console.log('check boookings, clinic: ' + clinicID)
-
-  for(let i = 0; i < timeslots.length; i++ ){
+  for (let i = 0; i < timeslots.length; i++) {
     Booking.find(
       {
         clinicID: ObjectId.isValid(clinicID),
         date: timeslots[i].date,
-        startTime: timeslots[i].start
+        startTime: timeslots[i].start,
       },
-      function(err, booking){
-        if(err){
-          console.log(err.message)
+      function (err, booking) {
+        if (err) {
+          console.log(err.message);
         }
-        console.log('Booking: ' + booking)
-    })
-
+        console.log("Booking: " + booking);
+      }
+    );
   }
-
-  // timeslots.timeslots.forEach(timeslot => {
-    
-
-  // });
-
+  // TODO: Call filterAvailabilityZero
 }
 
-
-
 // update availability (if 0 remove)
-function filterAvailabiltyZero (timeslots){
-  return result = timeslots.timeslots.filter(item => item.available !== '0');
+function filterAvailabiltyZero(timeslots) {
+  return (result = timeslots.timeslots.filter(
+    (item) => item.available !== "0"
+    // TODO: update availability (-1), remove if availability is 0
+  ));
 }
 
 // Vi skickar timeslotsen till frontend
-function forwardTimeslots (timeslots) {
+function forwardTimeslots(timeslots) {
   client.publish(timeslotsValidatedTopic, JSON.stringify(timeslots));
-  console.log('Validated timeslots ' + timeslots); 
+  console.log("Validated timeslots " + timeslots);
 }
