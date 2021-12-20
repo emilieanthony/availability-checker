@@ -17,6 +17,7 @@ const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots"
 /**  Published topics */
 const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forward to Booking Handler
 const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Message to frontend
+const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"
 
 /** Import the database. Connection happens in the Database.js file */
 const database = require("./Database");
@@ -226,25 +227,35 @@ const rejectBooking = (booking) => {
 /* Check timeslots functions */
 
 function saveTimeslotsAsArray (message) {
-    var timeslot = message;
+    let timeslot = message;
     //let timeslots = [];
     //timeslots.push(timeslot);
     console.log(timeslot); 
     const result = updateBreaks(timeslot);
+    checkBookings(result)
     // Get non-filter timeslots in array
 };
 
 
 
 function updateBreaks (timeslots) {
-
   return result = timeslots.timeslots.filter(item => item.start !== '12:00' && item.start !== '12:30' && item.start !== '10:00' && item.start !== '15:00');
-
-  // timeslots = fikaBreak(timeslots); 
-  // After this check bookings 
 };
 
 // check bookings 
+function checkBookings (timeslots) {
+  
+}
+
+
+
 // update availability (if 0 remove)
+function filterAvailabiltyZero (timeslots){
+  return result = timeslots.timeslots.filter(item => item.available !== '0');
+}
 
 // Vi skickar timeslotsen till frontend
+function forwardTimeslots (timeslots) {
+  client.publish(timeslotsValidatedTopic, JSON.stringify(timeslots));
+  console.log('Validated timeslots ' + timeslots); 
+}
