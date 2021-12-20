@@ -3,7 +3,7 @@ require("dotenv").config();
 const { MinPriorityQueue } = require("@datastructures-js/priority-queue");
 /** Required libraries */
 const mongoose = require("mongoose");
-
+const ObjectId = require("mongoose").Types.ObjectId;
 /** Database Models */
 const Booking = require("./Models/booking.js");
 const Dentist = require("./Models/dentist.js");
@@ -28,7 +28,7 @@ mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
 var data = {
-  "clinicId": "",
+  "clinicId": "1",
   "timeslots":[
     {
       "_id": "61bc57e6ce0d87512e7329ab",
@@ -232,7 +232,10 @@ function saveTimeslotsAsArray (message) {
     //timeslots.push(timeslot);
     console.log(timeslot); 
     const result = updateBreaks(timeslot);
-    checkBookings(result)
+    console.log('result')
+
+    console.log(result)
+    checkBookings(result, timeslot.clinicId);
     // Get non-filter timeslots in array
 };
 
@@ -243,8 +246,30 @@ function updateBreaks (timeslots) {
 };
 
 // check bookings 
-function checkBookings (timeslots) {
-  
+function checkBookings (timeslots, clinicID) {
+  console.log('check boookings, clinic: ' + clinicID)
+
+  for(let i = 0; i < timeslots.length; i++ ){
+    Booking.find(
+      {
+        clinicID: ObjectId.isValid(clinicID),
+        date: timeslots[i].date,
+        startTime: timeslots[i].start
+      },
+      function(err, booking){
+        if(err){
+          console.log(err.message)
+        }
+        console.log('Booking: ' + booking)
+    })
+
+  }
+
+  // timeslots.timeslots.forEach(timeslot => {
+    
+
+  // });
+
 }
 
 
