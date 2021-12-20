@@ -14,6 +14,7 @@ const mqtt = require("./Mqtt");
 /**  Subscribed topics */
 const checkBookingTopic = "Team5/Dentistimo/Check/Booking"; //Booking information from frontend - confirm - should include issuance
 const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots";
+
 /**  Published topics */
 const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forward to Booking Handler
 const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Forward to Frontend
@@ -28,16 +29,15 @@ mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
 mqtt.client.on("message", function (topic, message) {
+  let incomingMessage = JSON.parse(message.toString());
   switch (topic) {
     case checkBookingTopic:
-      console.log(
-        "Message booking from Frontend" + JSON.parse(message.toString())
-      );
+      console.log("Message booking from Frontend" + message);
       bookingQueue(JSON.parse(message));
       bookingAvailability();
       break;
     case getTimeslotTopic:
-      console.log("Message from Timeslot" + JSON.parse(message.toString()));
+      console.log("Message from Timeslot" + message);
       saveTimeslotsAsArray(JSON.parse(message));
       break;
     default:
@@ -56,7 +56,7 @@ const bookingQueue = (booking) => {
 };
 
 const bookingAvailability = () => {
-  //refactor after testing
+  //TODO: refactor after testing
   const booking = issuanceQueue.dequeue();
   Dentist.findById(booking.clinicID, function (err, dentist) {
     if (err) {
