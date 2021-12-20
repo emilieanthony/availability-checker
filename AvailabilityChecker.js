@@ -28,15 +28,12 @@ mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
 mqtt.client.on("message", function (topic, message) {
-  let incomingMessage = JSON.parse(message.toString());
   switch (topic) {
     case checkBookingTopic:
-      console.log("Message booking from Frontend" + message);
       bookingQueue(JSON.parse(message));
       bookingAvailability();
       break;
     case getTimeslotTopic:
-      console.log("Message from Timeslot" + message);
       saveTimeslotsAsArray(JSON.parse(message));
       break;
     default:
@@ -46,6 +43,7 @@ mqtt.client.on("message", function (topic, message) {
 
 /*  Check booking Functions */
 // TODO: Error handling (clinic null)
+// TODO: Recieve timestamp as milliseconds
 var issuanceQueue = new MinPriorityQueue({
   priority: (booking) => booking.timeStamp,
 });
@@ -55,7 +53,7 @@ const bookingQueue = (booking) => {
 };
 
 const bookingAvailability = () => {
-  //TODO: refactor after testing
+  //TODO: Refactor after testing
   const booking = issuanceQueue.dequeue();
   console.log(booking);
   Dentist.findById(booking.element.clinicId, function (err, dentist) {
@@ -95,6 +93,7 @@ const checkAvailability = (nrAvailableDentists, booking) => {
   }
 };
 
+// Make sure booking from frontend matches booking schema
 const convertBooking = (booking) => {
   const b = new Booking();
   b.userSSN = booking.ssn;
@@ -119,21 +118,16 @@ const rejectBooking = (booking) => {
 };
 
 /* Check timeslots functions */
-function saveTimeslotsAsArray(message) {
-  let timeslot = message;
-  //let timeslots = [];
-  //timeslots.push(timeslot);
-  console.log("saveTimeSlotArray:" + timeslot);
-  const result = updateBreaks(timeslot);
-  console.log("result");
 
-  console.log("saveTimeSlotArray RESULT AFTER FILTERING:" + result);
-  checkBookings(result, timeslot.clinicId);
+function saveTimeslotsAsArray(message) {
+  let timeslots = message.timeSlots;
+  const result = updateBreaks(timeslots);
+  checkBookings(result, message.clinicId);
 }
 
 function updateBreaks(timeslots) {
   // TODO: Refactor magic numbers
-  return (result = timeslots.timeSlots.filter(
+  return (result = timeslots.filter(
     (item) =>
       item.start !== "12:00" &&
       item.start !== "12:30" &&
@@ -142,38 +136,43 @@ function updateBreaks(timeslots) {
   ));
 }
 
-// check bookings
-function checkBookings(timeslots, clinicID) {
+// update availability for timeslots
+async function checkBookings(timeslots, clinicID) {
   console.log("check boookings, clinic: " + clinicID);
 
+  const promises = [];
   for (let i = 0; i < timeslots.length; i++) {
-    Booking.find(
-      {
+    promises.push(
+      Booking.find({
         clinic: mongoose.Types.ObjectId(clinicID),
         date: timeslots[i].date,
         startTime: timeslots[i].start,
-      },
-      function (err, booking) {
-        if (err) {
-          console.log(err.message);
-        }
-        console.log("Booking: " + booking);
-      }
+      })
     );
   }
-  // TODO: Call filterAvailabilityZero
+  const bookings = await Promise.all(promises);
+  timeslots = filterAvailabiltyZero(timeslots, bookings);
+  forwardTimeslots(timeslots, clinicID);
 }
 
-// update availability (if 0 remove)
-function filterAvailabiltyZero(timeslots) {
-  return (result = timeslots.timeslots.filter(
-    (item) => item.available !== "0"
-    // TODO: update availability (-1), remove if availability is 0 - only from message to frontend
-  ));
+// updates availability and filters
+function filterAvailabiltyZero(timeslots, bookings) {
+  return (result = timeslots
+    .map((timeslot, index) => {
+      timeslot.available = timeslot.available - bookings[index].length;
+      return timeslot;
+    })
+    .filter((item) => item.available > 0));
 }
 
-// Vi skickar timeslotsen till frontend
-function forwardTimeslots(timeslots) {
-  mqtt.client.publish(timeslotsValidatedTopic, JSON.stringify(timeslots));
+// Forward timeslots to frontend
+function forwardTimeslots(timeslots, clinicId) {
+  mqtt.client.publish(
+    timeslotsValidatedTopic,
+    JSON.stringify({
+      timeSlots: timeslots,
+      clinicId: clinicId,
+    })
+  );
   console.log("Validated timeslots " + timeslots);
 }
