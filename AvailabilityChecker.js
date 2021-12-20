@@ -145,8 +145,10 @@ async function checkBookings(timeslots, clinicID) {
     promises.push(
       Booking.find({
         clinic: mongoose.Types.ObjectId(clinicID),
-        date: timeslots[i].date,
-        startTime: timeslots[i].start,
+        date: new Date(convertDate(timeslots[i].date))
+          .toISOString()
+          .slice(0, 10),
+        startTime: timeslots[i].start + "-" + timeslots[i].end,
       })
     );
   }
@@ -154,6 +156,15 @@ async function checkBookings(timeslots, clinicID) {
   timeslots = filterAvailabiltyZero(timeslots, bookings);
   forwardTimeslots(timeslots, clinicID);
 }
+
+const convertDate = (date) => {
+  const parts = date.split(" ");
+  if (parts.length != 4) {
+    console.error("Date from timeslot generator has invalid format");
+  } else {
+    return parts[2] + " " + parts[1] + " " + parts[3] + " 00:00:00 UTC";
+  }
+};
 
 // updates availability and filters
 function filterAvailabiltyZero(timeslots, bookings) {
