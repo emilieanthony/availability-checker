@@ -3,7 +3,6 @@ require("dotenv").config();
 const { MinPriorityQueue } = require("@datastructures-js/priority-queue");
 /** Required libraries */
 const mongoose = require("mongoose");
-const ObjectId = require("mongoose").Types.ObjectId;
 /** Database Models */
 const Booking = require("./Models/booking.js");
 const Dentist = require("./Models/dentist.js");
@@ -46,9 +45,9 @@ mqtt.client.on("message", function (topic, message) {
 });
 
 /*  Check booking Functions */
-// TODO: Errror handling (clinic null)
+// TODO: Error handling (clinic null)
 var issuanceQueue = new MinPriorityQueue({
-  priority: (booking) => booking.issuance,
+  priority: (booking) => booking.timeStamp,
 });
 
 const bookingQueue = (booking) => {
@@ -58,7 +57,8 @@ const bookingQueue = (booking) => {
 const bookingAvailability = () => {
   //TODO: refactor after testing
   const booking = issuanceQueue.dequeue();
-  Dentist.findById(booking.clinicID, function (err, dentist) {
+  console.log(booking);
+  Dentist.findById(booking.element.clinicId, function (err, dentist) {
     if (err) {
       console.error(err);
       return;
@@ -70,9 +70,9 @@ const bookingAvailability = () => {
     }
     Booking.find(
       {
-        clinicID: booking.clinicID,
+        clinic: booking.clinicId,
         date: booking.date,
-        starttime: booking.starttime,
+        starttime: booking.time,
       },
       function (err, bookings) {
         if (err) {
@@ -80,7 +80,8 @@ const bookingAvailability = () => {
           return;
         }
         const nrAvailableDentists = dentist.dentists - bookings.length;
-        checkAvailability(nrAvailableDentists, booking);
+        console.log(dentist);
+        checkAvailability(nrAvailableDentists, booking.element);
       }
     );
   });
@@ -94,18 +95,30 @@ const checkAvailability = (nrAvailableDentists, booking) => {
   }
 };
 
+const convertBooking = (booking) => {
+  const b = new Booking();
+  b.userSSN = booking.ssn;
+  b.clinic = booking.clinicId;
+  b.date = booking.date;
+  b.startTime = booking.time;
+  return b;
+};
+
 const forwardBooking = (booking) => {
-  client.publish(bookingValidatedTopic, JSON.stringify(booking));
-  console.log("Timeslot validated:" + bookingInfo);
+  console.log(JSON.stringify(convertBooking(booking)));
+  mqtt.client.publish(
+    bookingValidatedTopic,
+    JSON.stringify(convertBooking(booking))
+  );
+  console.log("Timeslot validated");
 };
 
 const rejectBooking = (booking) => {
-  client.publish(bookingRejectedTopic, JSON.stringify(booking));
-  console.log("Booking rejected:" + bookingInfo);
+  mqtt.client.publish(bookingRejectedTopic, JSON.stringify(booking));
+  console.log("Booking rejected");
 };
 
 /* Check timeslots functions */
-
 function saveTimeslotsAsArray(message) {
   let timeslot = message;
   //let timeslots = [];
@@ -136,7 +149,7 @@ function checkBookings(timeslots, clinicID) {
   for (let i = 0; i < timeslots.length; i++) {
     Booking.find(
       {
-        clinicID: ObjectId.isValid(clinicID),
+        clinic: mongoose.Types.ObjectId(clinicID),
         date: timeslots[i].date,
         startTime: timeslots[i].start,
       },
@@ -155,12 +168,12 @@ function checkBookings(timeslots, clinicID) {
 function filterAvailabiltyZero(timeslots) {
   return (result = timeslots.timeslots.filter(
     (item) => item.available !== "0"
-    // TODO: update availability (-1), remove if availability is 0
+    // TODO: update availability (-1), remove if availability is 0 - only from message to frontend
   ));
 }
 
 // Vi skickar timeslotsen till frontend
 function forwardTimeslots(timeslots) {
-  client.publish(timeslotsValidatedTopic, JSON.stringify(timeslots));
+  mqtt.client.publish(timeslotsValidatedTopic, JSON.stringify(timeslots));
   console.log("Validated timeslots " + timeslots);
 }
