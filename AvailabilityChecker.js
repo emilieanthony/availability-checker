@@ -43,7 +43,6 @@ mqtt.client.on("message", function (topic, message) {
 
 /*  Check booking Functions */
 // TODO: Error handling (clinic null)
-// TODO: Recieve timestamp as milliseconds
 var issuanceQueue = new MinPriorityQueue({
   priority: (booking) => booking.timeStamp,
 });
