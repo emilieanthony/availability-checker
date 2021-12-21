@@ -126,13 +126,17 @@ function saveTimeslotsAsArray(message) {
 }
 
 function updateBreaks(timeslots) {
-  // TODO: Refactor magic numbers
+  const LUNCH_1 = "12:00";
+  const LUNCH_2 = "12:30";
+  const FIKA_1 = "10:00";
+  const FIKA_2 = "15:00";
+
   return (result = timeslots.filter(
     (item) =>
-      item.start !== "12:00" &&
-      item.start !== "12:30" &&
-      item.start !== "10:00" &&
-      item.start !== "15:00"
+      item.start !== LUNCH_1 &&
+      item.start !== LUNCH_2 &&
+      item.start !== FIKA_1 &&
+      item.start !== FIKA_2
   ));
 }
 
