@@ -26,6 +26,53 @@ The component expects stringified json objects sent via MQTT.
 #### Data input from time slots generator
 - Timeslots
 
+<b>Example</b>
+
+```
+{
+"clinicId": "",
+"timeslots":[
+  {
+    "_id": "61bc57e6ce0d87512e7329ab",
+    "start": "9:00",
+    "end": "9:30",
+    "available": 3,
+    "date": "Thu Dec 02 2021"
+},
+  {
+    "_id": "61bc57e6ce0d87512e7329ac",
+    "start": "9:30",
+    "end": "10:00",
+    "available": 3,
+    "date": "Thu Dec 02 2021"
+  },
+  {
+    "_id": "61bc57e6ce0d87512e7329ad",
+    "start": "10:00",
+    "end": "10:30",
+    "available": 3,
+    "date": "Thu Dec 02 2021"
+  },
+  {
+    "_id": "61bc57e6ce0d87512e7329ae",
+    "start": "10:30",
+    "end": "11:00",
+    "available": 3,
+    "date": "Thu Dec 02 2021"
+  },
+  {
+    "_id": "61bc57e6ce0d87512e7329ba",
+    "start": "16:30",
+    "end": "17:00",
+    "available": 3,
+    "date": "Thu Dec 02 2021"
+  }
+]
+}
+```
+
+
+
 #### Data input from frontend
 - Booking information
 
