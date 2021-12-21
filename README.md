@@ -1,4 +1,4 @@
-# Booking Handler
+# Avaliability Checker
 
 ## Description
 
