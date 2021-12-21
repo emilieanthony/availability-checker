@@ -23,7 +23,7 @@ const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"; // Forwa
 const database = require("./Database");
 const booking = require("./Models/booking.js");
 
-mqtt.subscribeToTopic(checkBookingTopic); //TODO: Update to the topic from frontend
+mqtt.subscribeToTopic(checkBookingTopic);
 mqtt.subscribeToTopic(getTimeslotTopic);
 
 /**  Listen to messages below */
@@ -93,7 +93,7 @@ const checkAvailability = (nrAvailableDentists, booking) => {
   }
 };
 
-// Make sure booking from frontend matches booking schema
+// Function makes sure booking from frontend matches booking schema
 const convertBooking = (booking) => {
   const b = new Booking();
   b.userSSN = booking.ssn;
