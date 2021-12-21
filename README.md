@@ -76,6 +76,18 @@ The component expects stringified json objects sent via MQTT.
 #### Data input from frontend
 - Booking information
 
+**Example**
+```
+{
+"_id":"61c1c78d11a27701b938fd09",
+"userSSN":124,
+"clinic":"61c1c29ea80761ab249e4e1f",
+"date":"2021-12-15",
+"startTime":"7:00-7:30"
+}
+```
+
+
 ### Data output
 
 #### Data output to booking handler
