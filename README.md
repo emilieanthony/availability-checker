@@ -91,7 +91,20 @@ The component expects stringified json objects sent via MQTT.
 ### Data output
 
 #### Data output to booking handler
-- Booking request in the right format
+- Forward booking requests from the frontent in the right format to the booking handler
+
+**Example**
+
+```
+{
+  _id: new ObjectId("61c1cfe391f392eb3210efa9"),
+  userSSN: 7712318998,
+  clinic: new ObjectId("61c1c29ea80761ab249e4e1f"),
+  date: '2021-12-29',
+  startTime: '8:30-9:00'
+}
+```
+
 
 #### Data output to frontend
 - Validation or rejection
@@ -115,9 +128,9 @@ To download the latest version of node.js, please follow this [link](https://nod
 
 In the window of your broker, you should see a message similar to this:
 
-`1638885841: New client connected from 127.0.0.1:49531 as Dentistimo Team5 - Booking Handler n°3c1ff99e (p2, c1, k60).`
+`1638885841: New client connected from 127.0.0.1:49531 as Dentistimo Team5 - Avaliability Checker n°3c1ff99e (p2, c1, k60).`
 
-The booking handler is now ready to proceed your requests. 
+The availability checker is now ready to proceed your requests. 
  
 
 
