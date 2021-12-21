@@ -13,6 +13,8 @@ The avaliability checker provides the booking handler with valid booking request
 - Validate booking requests
 - Trigger the booking handler
 
+![_Current_state__System_Component_Diagram-21_dec.drawio](/uploads/d9ba9b8d588fdd14e6c6e450354aa1d7/_Current_state__System_Component_Diagram-21_dec.drawio.png)
+
 ## Data input and output
 ### Data input
 
