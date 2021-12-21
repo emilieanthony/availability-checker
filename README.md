@@ -6,7 +6,7 @@ This component is part of the the distributed system DENTISTIMO, a web applicati
 The avaliability checker provides the booking handler with valid booking requests. More details can be found in the component diagram below as well as further in this README.md file.
 
 ## System Architecture - Component Diagram
-![_Current_state__System_Component_Diagram-21_dec.drawio](/uploads/d9ba9b8d588fdd14e6c6e450354aa1d7/_Current_state__System_Component_Diagram-21_dec.drawio.png)
+![_Current_state__System_Component_Diagram-21_dec.drawio__1_](/uploads/7491021313f4e9ccc8e57c642fdb4c49/_Current_state__System_Component_Diagram-21_dec.drawio__1_.png)
 
 ## Component Responsibilities
 
