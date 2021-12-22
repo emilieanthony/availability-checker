@@ -140,7 +140,7 @@ function updateBreaks(timeslots) {
 }
 
 // update availability for timeslots
-async function checkBookings(timeslots, clinicID) {
+function checkBookings(timeslots, clinicID) {
   console.log("check boookings, clinic: " + clinicID);
 
   const promises = [];
@@ -155,9 +155,10 @@ async function checkBookings(timeslots, clinicID) {
       })
     );
   }
-  const bookings = await Promise.all(promises);
-  timeslots = filterAvailabiltyZero(timeslots, bookings);
-  forwardTimeslots(timeslots, clinicID);
+  Promise.all(promises).then((bookings) => {
+    timeslots = filterAvailabiltyZero(timeslots, bookings);
+    forwardTimeslots(timeslots, clinicID);
+  });
 }
 
 const convertDate = (date) => {
