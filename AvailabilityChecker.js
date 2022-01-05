@@ -12,7 +12,6 @@ const mqtt = require("./Mqtt");
 module.exports.mqtt = mqtt;
 
 /**  Subscribed topics */
-
 const checkBookingTopic = "Team5/Dentistimo/Check/Booking"; //Booking information from frontend - confirm - should include issuance
 const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots";
 
@@ -20,7 +19,7 @@ const topicsToSubscribeTo = [
   checkBookingTopic,
   getTimeslotTopic
 ]
-module.exports.listOfTopics = topicsToSubscribeTo
+module.exports.listOfTopics = topicsToSubscribeTo;
 
 /**  Published topics */
 const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forward to Booking Handler
