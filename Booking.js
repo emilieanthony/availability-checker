@@ -14,7 +14,7 @@ const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forw
 const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Forward to Frontend
 
 /********************************************************** */
-/* Check bookings availability functions */
+/* Check bookings availability */
 /********************************************************** */
 
 // TODO: Error handling (clinic null)
@@ -22,11 +22,17 @@ let issuanceQueue = new MinPriorityQueue({
   priority: (booking) => booking.timeStamp,
 });
 
-
+/**
+ * Adds booking to min priority queue
+ * @param {*} booking 
+ */
 module.exports.bookingQueue = (booking) => {
   issuanceQueue.enqueue(booking);
 };
 
+/**
+ * Takes the prioritised booking and finds nr of available dentists at the time of the booking
+ */
 module.exports.bookingAvailability = () => {
   //TODO: Refactor after testing
   const booking = issuanceQueue.dequeue();
@@ -53,13 +59,17 @@ module.exports.bookingAvailability = () => {
           return;
         }
         const nrAvailableDentists = dentist.dentists - bookings.length;
-        console.log(dentist);
         checkAvailability(nrAvailableDentists, booking.element);
       }
     );
   });
 };
 
+/**
+ * If the there is an available timeslot forward booking, else reject
+ * @param {*} nrAvailableDentists 
+ * @param {*} booking 
+ */
 const checkAvailability = (nrAvailableDentists, booking) => {
   if (nrAvailableDentists > 0) {
     forwardBooking(booking);
@@ -68,7 +78,11 @@ const checkAvailability = (nrAvailableDentists, booking) => {
   }
 };
 
-// Function makes sure booking from frontend matches booking schema
+/**
+ * Ensures booking from frontend matches booking schema
+ * @param {*} booking 
+ * @returns correct booking schema 
+ */
 const convertBooking = (booking) => {
   const b = new Booking();
   b.userSSN = booking.ssn;
@@ -78,15 +92,23 @@ const convertBooking = (booking) => {
   return b;
 };
 
+/**
+ * Forwards validated booking to frontend
+ * @param {*} booking a validated booking
+ */
 const forwardBooking = (booking) => {
   console.log(JSON.stringify(convertBooking(booking)));
   mqtt.client.publish(
     bookingValidatedTopic,
     JSON.stringify(convertBooking(booking))
   );
-  console.log("Timeslot validated");
+  console.log("Booking validated");
 };
 
+/**
+ * Notifies Frontend that booking is invalid and has been rejected
+ * @param {*} booking invalid booking
+ */
 const rejectBooking = (booking) => {
   mqtt.client.publish(bookingRejectedTopic, JSON.stringify(booking));
   console.log("Booking rejected");
