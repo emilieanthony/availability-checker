@@ -15,6 +15,7 @@ module.exports.mqtt = mqtt;
 
 const checkBookingTopic = "Team5/Dentistimo/Check/Booking"; //Booking information from frontend - confirm - should include issuance
 const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots";
+const clientErrorTopic = "/Team5/Dentistimo/Client/Error";
 
 const topicsToSubscribeTo = [
   checkBookingTopic,
@@ -37,11 +38,21 @@ mqtt.subscribeToAll(topicsToSubscribeTo);
 mqtt.client.on("message", function (topic, message) {
   switch (topic) {
     case checkBookingTopic:
-      bookingQueue(JSON.parse(message));
-      bookingAvailability();
+      try {
+        bookingQueue(JSON.parse(message));
+        bookingAvailability();
+      } catch (error) {
+        console.log(error)
+        mqtt.client.publish(clientErrorTopic, JSON.stringify(error));
+      }
       break;
     case getTimeslotTopic:
-      saveTimeslotsAsArray(JSON.parse(message));
+      try {
+        saveTimeslotsAsArray(JSON.parse(message));
+      } catch (error) {
+        console.log(error)
+        mqtt.client.publish(clientErrorTopic, JSON.stringify(error));
+      }
       break;
     default:
       break;
