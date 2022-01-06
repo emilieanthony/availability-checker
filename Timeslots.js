@@ -4,19 +4,28 @@ module.exports.mqtt = mqtt;
 const Booking = require("./Models/booking.js");
 const mongoose = require("mongoose");
 
-// publish topic
+// Published topic
 const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"; // Forward to Frontend
 
 /********************************************************** */
-/* Check timeslots availability functions */
+/* Check and update timeslots availability */
 /********************************************************** */
 
+/**
+ * Starting point
+ * @param {*} message timeslots as JSON 
+ */
 module.exports.saveTimeslotsAsArray = function (message) {
     let timeslots = message.timeSlots;
     const result = updateBreaks(timeslots);
     checkBookings(result, message.clinicId);
 }
   
+/**
+ * Removes breaks from timeslots so that the breaks are kept free
+ * @param {*} timeslots 
+ * @returns updated timeslots
+ */
 function updateBreaks(timeslots) {
     const LUNCH_1 = "12:00";
     const LUNCH_2 = "12:30";
@@ -32,7 +41,13 @@ function updateBreaks(timeslots) {
     ));
 }
   
-  // update availability for timeslots
+  /**
+   * Finds all bookings made to the clinic at the date. Then calls 
+   * methods filterAvailablity and forwardTimeslots
+   * to filter and finally to forward timeslots. 
+   * @param {*} timeslots timeslots with updated breaks
+   * @param {*} clinicID 
+   */
 function checkBookings(timeslots, clinicID) {
     console.log("check boookings, clinic: " + clinicID);
   
@@ -53,7 +68,12 @@ function checkBookings(timeslots, clinicID) {
       forwardTimeslots(timeslots, clinicID);
     });
 }
-  
+
+/**
+ * Ensures that the correct date format is used
+ * @param {*} date 
+ * @returns 
+ */
 const convertDate = (date) => {
     const parts = date.split(" ");
     if (parts.length != 4) {
@@ -63,7 +83,13 @@ const convertDate = (date) => {
     }
 };
   
-  // updates availability and filters
+/**
+ * Filters availabilty based on how many bookings have already been made 
+ * at a timeslot.  
+ * @param {*} timeslots 
+ * @param {*} bookings 
+ * @returns updated timeslots with available timeslots. 
+ */
 function filterAvailabilty(timeslots, bookings) {
     console.log('filter');
     return (result = timeslots
@@ -74,8 +100,13 @@ function filterAvailabilty(timeslots, bookings) {
       .filter((item) => item.available > 0));
 }
   
-  // Forward timeslots to frontend
   //TODO: check mqtt, use publish in mqtt.js? 
+
+  /**
+   * Forwards valid timeslots to frontend via MQTT
+   * @param {*} timeslots 
+   * @param {*} clinicId 
+   */
 function forwardTimeslots(timeslots, clinicId) {
     console.log('forward');
 
