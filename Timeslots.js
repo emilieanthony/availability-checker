@@ -12,10 +12,11 @@ const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"; // Forwa
 /********************************************************** */
 
 /**
- * Starting point
+ * Starting point for checking timeslots availabilty
  * @param {*} message timeslots as JSON 
  */
-module.exports.saveTimeslotsAsArray = function (message) {
+module.exports.checkTimeslots = function (message) {
+    console.log("Validating timeslots");
     let timeslots = message.timeSlots;
     const result = updateBreaks(timeslots);
     checkBookings(result, message.clinicId);
@@ -49,7 +50,6 @@ function updateBreaks(timeslots) {
    * @param {*} clinicID 
    */
 function checkBookings(timeslots, clinicID) {
-    console.log("check boookings, clinic: " + clinicID);
   
     const promises = [];
     for (let i = 0; i < timeslots.length; i++) {
@@ -112,7 +112,7 @@ function forwardTimeslots(timeslots, clinicId) {
     }),
     {qos:1}
   );
-  console.log("Validated timeslots " + timeslots);
+  console.log("Timeslots have been validated");
 }
 
   

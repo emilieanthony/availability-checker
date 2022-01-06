@@ -17,7 +17,6 @@ const bookingRejectedTopic = "Team5/Dentistimo/Reject/Booking"; // Forward to Fr
 /* Check bookings availability */
 /********************************************************** */
 
-// TODO: Error handling (clinic null)
 let issuanceQueue = new MinPriorityQueue({
   priority: (booking) => booking.timeStamp,
 });
@@ -26,17 +25,19 @@ let issuanceQueue = new MinPriorityQueue({
  * Adds booking to min priority queue
  * @param {*} booking 
  */
-module.exports.bookingQueue = (booking) => {
-  issuanceQueue.enqueue(booking);
+module.exports.enqueueBooking = (booking) => {
+  if (!booking.clinicId || !booking.ssn || !booking.date || !booking.time || !booking.timeStamp){
+    throw 'Invalid booking format, missing field';
+  } else {
+    issuanceQueue.enqueue(booking);
+  }
 };
 
 /**
  * Takes the prioritised booking and finds nr of available dentists at the time of the booking
  */
-module.exports.bookingAvailability = () => {
-  //TODO: Refactor after testing
+module.exports.validateBooking = () => {
   const booking = issuanceQueue.dequeue();
-  console.log(booking);
   Dentist.findById(booking.element.clinicId, function (err, dentist) {
     if (err) {
       console.error(err);

@@ -32,8 +32,8 @@ mqtt.client.on("message", function (topic, message) {
   switch (topic) {
     case checkBookingTopic:
       try {
-        bookingsController.bookingQueue(JSON.parse(message));
-        bookingsController.bookingAvailability();
+        bookingsController.enqueueBooking(JSON.parse(message));
+        bookingsController.validateBooking();
       } catch (error) {
         console.log(error)
         mqtt.client.publish(clientErrorTopic, JSON.stringify(error));
@@ -41,7 +41,7 @@ mqtt.client.on("message", function (topic, message) {
       break;
     case getTimeslotTopic:
       try {
-        timeslotsController.saveTimeslotsAsArray(JSON.parse(message));
+        timeslotsController.checkTimeslots(JSON.parse(message));
       } catch (error) {
         console.log(error)
         mqtt.client.publish(clientErrorTopic, JSON.stringify(error));
