@@ -9,10 +9,18 @@ const Dentist = require("./Models/dentist.js");
 
 /** Import the Mqtt file which connects to the broker and provide client,as well as publishing and subscribing functions */
 const mqtt = require("./Mqtt");
+module.exports.mqtt = mqtt;
 
 /**  Subscribed topics */
+
 const checkBookingTopic = "Team5/Dentistimo/Check/Booking"; //Booking information from frontend - confirm - should include issuance
 const getTimeslotTopic = "/Team5/Dentistimo/TimeSlots";
+
+const topicsToSubscribeTo = [
+  checkBookingTopic,
+  getTimeslotTopic
+]
+module.exports.listOfTopics = topicsToSubscribeTo
 
 /**  Published topics */
 const bookingValidatedTopic = "Team5/Dentistimo/Booking/Create/Request"; // Forward to Booking Handler
@@ -23,8 +31,7 @@ const timeslotsValidatedTopic = "Team5/Dentistimo/Timeslots/Validated"; // Forwa
 const database = require("./Database");
 const booking = require("./Models/booking.js");
 
-mqtt.subscribeToTopic(checkBookingTopic);
-mqtt.subscribeToTopic(getTimeslotTopic);
+mqtt.subscribeToAll(topicsToSubscribeTo);
 
 /**  Listen to messages below */
 mqtt.client.on("message", function (topic, message) {
