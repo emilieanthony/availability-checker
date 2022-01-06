@@ -98,9 +98,11 @@ const convertBooking = (booking) => {
  */
 const forwardBooking = (booking) => {
   console.log(JSON.stringify(convertBooking(booking)));
-  mqtt.client.publish(
+
+  mqtt.publishToTopic(
     bookingValidatedTopic,
-    JSON.stringify(convertBooking(booking))
+    JSON.stringify(convertBooking(booking)),
+    {qos:1}
   );
   console.log("Booking validated");
 };
@@ -110,6 +112,6 @@ const forwardBooking = (booking) => {
  * @param {*} booking invalid booking
  */
 const rejectBooking = (booking) => {
-  mqtt.client.publish(bookingRejectedTopic, JSON.stringify(booking));
+  mqtt.publishToTopic(bookingRejectedTopic, JSON.stringify(booking), {qos:1})
   console.log("Booking rejected");
 };

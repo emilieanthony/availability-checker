@@ -91,7 +91,6 @@ const convertDate = (date) => {
  * @returns updated timeslots with available timeslots. 
  */
 function filterAvailabilty(timeslots, bookings) {
-    console.log('filter');
     return (result = timeslots
       .map((timeslot, index) => {
         timeslot.available = timeslot.available - bookings[index].length;
@@ -99,26 +98,21 @@ function filterAvailabilty(timeslots, bookings) {
       })
       .filter((item) => item.available > 0));
 }
-  
-  //TODO: check mqtt, use publish in mqtt.js? 
-
-  /**
-   * Forwards valid timeslots to frontend via MQTT
-   * @param {*} timeslots 
-   * @param {*} clinicId 
-   */
+/**
+ * Forwards valid timeslots to frontend via MQTT
+ * @param {*} timeslots 
+ * @param {*} clinicId 
+ */
 function forwardTimeslots(timeslots, clinicId) {
-    console.log('forward');
-
-    console.log('publish')
-    mqtt.client.publish(
-      timeslotsValidatedTopic,
-      JSON.stringify({
-        timeSlots: timeslots,
-        clinicId: clinicId,
-      })
-    );
-    console.log("Validated timeslots " + timeslots);
+  mqtt.publishToTopic(
+    timeslotsValidatedTopic,
+    JSON.stringify({
+      timeSlots: timeslots,
+      clinicId: clinicId,
+    }),
+    {qos:1}
+  );
+  console.log("Validated timeslots " + timeslots);
 }
 
   
