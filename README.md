@@ -126,15 +126,14 @@ To download the latest version of node.js, please follow this [link](https://nod
 | ------ | ------ |
 | start your MQTT broker on port 1883| This differs based on which broker, as well as your settings. Make sure the broker listens to port 1883. (Default port with mosquitto) |
 | clone this project on your machine | `git clone < SSH address or HTTPS address >` |
-| go to repo and add .env file | Please contact one of the developers of this project to recieve the contents of the file. It should be placed directly in the repo.  |
+| go to repo and add .env file | Please contact one of the developers of this project to recieve the contents of the file. It should be placed directly in the repo. <img src="./Assets/picEnv.png"  width="120" height="120">|
 | Start the system from the repo by running the following  | `npm start` |
 
 In the window of your broker, you should see a message similar to this:
 
 `1638885841: New client connected from 127.0.0.1:49531 as Dentistimo Team5 - Avaliability Checker n°3c1ff99e (p2, c1, k60).`
 
-The availability checker is now ready to proceed your requests. 
- 
+The availability checker is now ready to proceed your requests.  
 
 
 
