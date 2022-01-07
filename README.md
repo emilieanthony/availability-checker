@@ -3,10 +3,8 @@
 ## Description
 
 This component is part of the the distributed system DENTISTIMO, a web application that offers a geolocalisation based dental care booking system.
-The avaliability checker provides the booking handler with valid booking requests and Dentistimo GUI with valid timeslots. More details can be found in the component diagram below as well as further in this README.md file.
+The avaliability checker provides the booking handler with valid booking requests and Dentistimo GUI with valid timeslots. More details can be found in the component diagram in the [documentation repository](https://git.chalmers.se/courses/dit355/test-teams-formation/team-5/team-4-project). 
 
-## System Architecture - Component Diagram
-![Component Diagram](https://git.chalmers.se/courses/dit355/test-teams-formation/team-5/team-4-project/uploads/1b6e1034386a6dfe53115cd98fffcf56/_Current_state__System_Component_Diagram-7_jan.drawio.png)
 
 
 ## Component Responsibilities
