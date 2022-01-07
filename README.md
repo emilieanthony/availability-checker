@@ -3,10 +3,12 @@
 ## Description
 
 This component is part of the the distributed system DENTISTIMO, a web application that offers a geolocalisation based dental care booking system.
-The avaliability checker provides the booking handler with valid booking requests. More details can be found in the component diagram below as well as further in this README.md file.
+The avaliability checker provides the booking handler with valid booking requests and Dentistimo GUI with valid timeslots. More details can be found in the component diagram below as well as further in this README.md file.
 
 ## System Architecture - Component Diagram
 ![_Current_state__System_Component_Diagram-21_dec.drawio__2_](/uploads/6b997b39e9b0acec3c3e3998323a8d55/_Current_state__System_Component_Diagram-21_dec.drawio__2_.png)
+
+
 
 ## Component Responsibilities
 
@@ -14,7 +16,7 @@ The avaliability checker provides the booking handler with valid booking request
 - Filter timeslots so that dentists can have lunch and fika
 - Forward this information to frontend that displays only available timeslots
 - Validate booking requests
-- Trigger the booking handler
+- Forward valid bookings to the booking handler
 
 
 
@@ -124,7 +126,7 @@ To download the latest version of node.js, please follow this [link](https://nod
 | ------ | ------ |
 | start your MQTT broker on port 1883| This differs based on which broker, as well as your settings. Make sure the broker listens to port 1883. (Default port with mosquitto) |
 | clone this project on your machine | `git clone < SSH address or HTTPS address >` |
-| go to repo and add .env file | Please contact one of the developers of this project to recieve the contents of the file. It should be placed directly in the repo. |
+| go to repo and add .env file | Please contact one of the developers of this project to recieve the contents of the file. It should be placed directly in the repo.  |
 | Start the system from the repo by running the following  | `npm start` |
 
 In the window of your broker, you should see a message similar to this:
